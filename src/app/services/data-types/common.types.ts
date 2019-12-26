@@ -15,3 +15,9 @@ export type SongSheet = {
     playCount: number;
     picUrl: string;
 }
+export type Singer = {
+    id: number;
+    name: string;
+    albumSize: number;
+    picUrl: string;
+}
