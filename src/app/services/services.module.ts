@@ -1,4 +1,5 @@
 import { NgModule, InjectionToken } from '@angular/core';
+import { environment } from 'src/environments/environment';
 
 export const API_CONFIG = new InjectionToken('ApiConfigToken');
 
@@ -7,7 +8,7 @@ export const API_CONFIG = new InjectionToken('ApiConfigToken');
   imports: [
   ],
   providers: [
-    {provide: API_CONFIG, useValue: 'http://192.168.1.15:3000/'},
+    {provide: API_CONFIG, useValue: environment.apiUrl},
   ]
 })
 export class ServicesModule { }
