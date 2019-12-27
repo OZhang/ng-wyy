@@ -5,6 +5,7 @@ import { NzCarouselComponent } from 'ng-zorro-antd';
 import { SingerService } from 'src/app/services/singerservice';
 import { ActivatedRoute } from '@angular/router';
 import { map } from 'rxjs/operators';
+import { SheetService } from 'src/app/services/sheetservice';
 
 @Component({
   selector: 'app-home',
@@ -16,28 +17,35 @@ export class HomeComponent implements OnInit {
   hotTags: HotTag[];
   songSheetList: SongSheet[];
   singers: Singer[];
-  @ViewChild(NzCarouselComponent, {static: true}) private naCarousel: NzCarouselComponent;
+  @ViewChild(NzCarouselComponent, { static: true }) private naCarousel: NzCarouselComponent;
   carouseActiveIndex: number = 0;
 
-  constructor(private homeService: HomeService, private singerService: SingerService, private route: ActivatedRoute) {
+  constructor(
+    private route: ActivatedRoute,
+    private sheetService: SheetService,
+  ) {
     this.route.data.pipe(map(res => res.homeData)).subscribe(([banners, hotTags, songSheetList, singers]) => {
       this.banners = banners;
       this.hotTags = hotTags;
       this.songSheetList = songSheetList;
       this.singers = singers;
     })
-   }
+  }
 
   ngOnInit() {
   }
 
-  onBeforeChange({to}){
+  onBeforeChange({ to }) {
     this.carouseActiveIndex = to;
   }
 
-  changeSlide(type: 'pre' | 'next'){
+  changeSlide(type: 'pre' | 'next') {
     this.naCarousel[type]();
   }
 
-
+  onPlaySheet(id: number) {
+    this.sheetService.playSheet(id).subscribe((res) => {
+      console.log(res);
+    });
+  }
 }
