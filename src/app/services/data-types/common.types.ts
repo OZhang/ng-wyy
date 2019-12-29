@@ -1,5 +1,5 @@
 export type Banner = {
-    targetId: number,
+    targetId: number;
     url: string;
     imageUrl: string;
 }
@@ -35,12 +35,3 @@ export type Singer = {
     albumSize: number;
     picUrl: string;
 }
-
-// export type SongSheet = {
-//     id: number;
-//     name: string;
-//     url: string;
-//     ar: Singer[];
-//     al: { id: number; name: string; picUrl: string };
-//     dt: number;
-// }

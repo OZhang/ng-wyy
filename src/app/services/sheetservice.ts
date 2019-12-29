@@ -11,13 +11,13 @@ import { SongService } from './songservice';
 })
 export class SheetService {
 
-  constructor(private http: HttpClient, private songService: SongService, @Inject(API_CONFIG) private url: string) { }
+  constructor(private http: HttpClient, private songService: SongService, @Inject(API_CONFIG) private uri: string) { }
 
   getSongSheetDetail(id: number): Observable<SongSheet> {
     // console.log("getSongSheetDetail id:,",id);
     const params = new HttpParams().set('id', id.toString());
-    return this.http.get(this.url + 'playlist/detail', { params })
-      .pipe(map((res: { playlist: SongSheet }) => res.playlist));
+    return this.http.get(this.uri + 'playlist/detail', { params })
+    .pipe(map((res: { playlist: SongSheet }) => res.playlist));
   }
 
   playSheet(id: number): Observable<Song[]> {

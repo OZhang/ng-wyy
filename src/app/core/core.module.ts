@@ -5,10 +5,11 @@ import { HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ServicesModule } from '../services/services.module';
 import { ShareModule } from '../share/share.module';
-import zh from '@angular/common/locales/zh';
 import { registerLocaleData } from '@angular/common';
 import { PagesModule } from '../pages/pages.module';
-
+import zh from '@angular/common/locales/zh';
+import { NZ_I18N, zh_CN } from 'ng-zorro-antd';
+import { AppStoreModule } from '../store';
 registerLocaleData(zh);
 
 @NgModule({
@@ -20,12 +21,14 @@ registerLocaleData(zh);
     ServicesModule,
     PagesModule,
     ShareModule,
+    AppStoreModule,
     AppRoutingModule,
   ],
   exports: [
     ShareModule,
-    AppRoutingModule,
-  ]
+    AppRoutingModule
+  ],
+  providers: [{ provide: NZ_I18N, useValue: zh_CN }],
 })
 export class CoreModule {
   constructor(@SkipSelf() @Optional() parentModule: CoreModule){

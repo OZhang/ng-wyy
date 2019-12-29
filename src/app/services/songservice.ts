@@ -10,12 +10,12 @@ import { SongUrl, Song } from './data-types/common.types';
 })
 export class SongService {
 
-  constructor(private http: HttpClient, @Inject(API_CONFIG) private url: string) { }
+  constructor(private http: HttpClient, @Inject(API_CONFIG) private uri: string) { }
 
   getSongUrl(ids: string): Observable<SongUrl[]> {
     const params = new HttpParams().set('id', ids);
-    return this.http.get(this.url + 'song/url', { params })
-      .pipe(map((res: { data: SongUrl[] }) => res.data));
+    return this.http.get(this.uri + 'song/url', { params })
+    .pipe(map((res: { data: SongUrl[] }) => res.data));
   }
 
   getSongList(songs: Song | Song[]): Observable<Song[]> {
@@ -27,7 +27,7 @@ export class SongService {
   private generateSongList(songs: Song[], urls: SongUrl[]): Song[] {
     const result = [];
     songs.forEach(song => {
-      const url = urls.find(url => url.id === song.id);
+      const url = urls.find(url => url.id === song.id).url;
       if (url) {
         result.push({ ...song, url });
       }

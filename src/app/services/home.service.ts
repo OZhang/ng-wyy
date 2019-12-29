@@ -10,14 +10,15 @@ import { map } from 'rxjs/internal/operators';
 })
 export class HomeService {
 
-  constructor(private http: HttpClient, @Inject(API_CONFIG) private url: string) { }
+  constructor(private http: HttpClient, @Inject(API_CONFIG) private uri: string) { }
+
   getBanners(): Observable<Banner[]> {
-    return this.http.get(this.url + 'banner')
-      .pipe(map((res: { banners: Banner[] }) => res.banners));
+    return this.http.get(this.uri + 'banner')
+    .pipe(map((res: { banners: Banner[] }) => res.banners));
   }
 
   getHotTags(): Observable<HotTag[]> {
-    return this.http.get(this.url + 'playlist/hot')
+    return this.http.get(this.uri + 'playlist/hot')
       .pipe(map((res: { tags: HotTag[] }) => {
         return res.tags.sort((x:HotTag, y:HotTag) => {
           return x.position - y.position ;
@@ -26,7 +27,7 @@ export class HomeService {
   }
 
   getPersonalSheetList(): Observable<SongSheet[]>{
-    return this.http.get(this.url + 'personalized')
+    return this.http.get(this.uri + 'personalized')
       .pipe(map((res: { result: SongSheet[] }) => res.result.slice(0,16)));
   }
 }

@@ -23,11 +23,11 @@ const defaultParams: SingerParams = {
 })
 export class SingerService {
 
-  constructor(private http: HttpClient, @Inject(API_CONFIG) private url: string) { }
+  constructor(private http: HttpClient, @Inject(API_CONFIG) private uri: string) { }
 
   getEnterSinger(args: SingerParams = defaultParams): Observable<Singer[]> {
     const params = new HttpParams({ fromString: queryString.stringify(args) })
-    return this.http.get(this.url + 'artist/list', { params })
+    return this.http.get(this.uri + 'artist/list', { params })
       .pipe(map((res: { artists: Singer[] }) => res.artists));
   }
 }
