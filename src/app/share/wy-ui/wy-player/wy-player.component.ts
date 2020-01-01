@@ -103,8 +103,8 @@ export class WyPlayerComponent implements OnInit {
         this.updateCurrentIndex(list, this.currentSong);
         this.store$.dispatch(SetPlayList({ playList: this.songList }));
       }else if (mode.type === 'singleLoop') {
-        this.updateCurrentIndex(list, this.currentSong);
         this.store$.dispatch(SetPlayList({ playList: [this.currentSong] }));
+        this.updateCurrentIndex(list, this.currentSong);
       }
     }
   }
