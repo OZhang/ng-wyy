@@ -2,6 +2,7 @@ import { Component, OnInit, ViewEncapsulation, ChangeDetectionStrategy, ViewChil
 import BScroll from '@better-scroll/core';
 import ScrollBar from '@better-scroll/scroll-bar';
 import MouseWheel from '@better-scroll/mouse-wheel';
+import { timer } from 'rxjs';
 BScroll.use(MouseWheel);
 BScroll.use(ScrollBar)
 
@@ -19,7 +20,7 @@ BScroll.use(ScrollBar)
 export class WyScrollComponent implements OnInit, AfterViewInit, OnChanges {
   @Input() refreshDelay = 50;
   @Input() data: any[];
-  @ViewChild('wrap', {static: true}) private wrapRef: ElementRef;
+  @ViewChild('wrap', { static: true }) private wrapRef: ElementRef;
   private bs: BScroll;
   @Output() private onScrollEnd = new EventEmitter<number>();
   constructor(readonly el: ElementRef) { }
@@ -29,37 +30,43 @@ export class WyScrollComponent implements OnInit, AfterViewInit, OnChanges {
 
   ngAfterViewInit(): void {
     console.log('offsetHeight: ', this.wrapRef.nativeElement.offsetHeight);
-    this.bs = new BScroll(this.wrapRef.nativeElement,{
+    this.bs = new BScroll(this.wrapRef.nativeElement, {
       scrollbar: {
         interactive: true
       },
       mouseWheel: {}
     });
 
-    this.bs.on('scrollEnd', ({y})=> {
+    this.bs.on('scrollEnd', ({ y }) => {
       this.onScrollEnd.emit(y)
     });
   }
 
-  ngOnChanges(changes:SimpleChanges): void {
-    if (changes['data']){
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['data']) {
       this.refreshScroll();
     }
   }
 
-  private refresh(){
+  private refresh() {
     console.log('refresh()')
     this.bs.refresh();
   }
 
-  refreshScroll(){
-    setTimeout(() =>{
+  refreshScroll() {
+    timer(this.refreshDelay).subscribe(() => {
       this.refresh();
-    },this.refreshDelay)
+    });
+    // setTimeout(() => {
+    //   this.refresh();
+    // }, this.refreshDelay)
   }
 
-  scrollToElement(...args){
+  scrollToElement(...args) {
     this.bs.scrollToElement.apply(this.bs, args);
   }
 
+  scrollTo(...args) {
+    this.bs.scrollToElement.apply(this.bs, args);
+  }
 }

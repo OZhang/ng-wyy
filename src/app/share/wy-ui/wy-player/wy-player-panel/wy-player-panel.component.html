@@ -3,7 +3,7 @@
         <div class="hdc">
             <h4>播放列表(<span>{{songList.length}}</span>)</h4>
             <div class="add-all">
-                <i class="icon" title="收藏全部"></i>收藏全部  
+                <i class="icon" title="收藏全部"></i>收藏全部
             </div>
             <span class="line"></span>
             <div class="clear-all">
@@ -19,7 +19,8 @@
         <div class="msk"></div>
         <app-wy-scroll class="list-wrap" [data]="songList" (onScrollEnd)="scrollY = $event">
             <ul>
-                <li *ngFor="let item of songList; index as i" [class.current]="currentIndex === i" (click)="onChangeSong.emit(item)">
+                <li *ngFor="let item of songList; index as i" [class.current]="currentIndex === i"
+                    (click)="onChangeSong.emit(item)">
                     <i class="col arrow"></i>
                     <div class="col name ellipsis">{{item.name}}</div>
                     <div class="col icons">
@@ -38,6 +39,15 @@
                 </li>
             </ul>
         </app-wy-scroll>
-        <ul>歌词</ul>
+
+        <app-wy-scroll class="list-lyric" [data]="currentLyric">
+            <ul>
+                <li *ngFor="let item of currentLyric; index as i" [class.current]="currentLineNum === i">
+                    {{item.txt}} <br /> {{item.txtCn}}
+                </li>
+            </ul>
+        </app-wy-scroll>
+
+
     </div>
 </div>

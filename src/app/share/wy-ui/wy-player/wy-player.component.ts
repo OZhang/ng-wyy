@@ -8,7 +8,8 @@ import { SetCurrentIndex, SetPlayMode, SetPlayList } from 'src/app/store/actions
 import { Subscribable, Subscription, fromEvent } from 'rxjs';
 import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 import { DOCUMENT } from '@angular/common';
-import { shuffle } from 'src/app/utils/array';
+import { shuffle, findIndex } from 'src/app/utils/array';
+import { WyPlayerPanelComponent } from './wy-player-panel/wy-player-panel.component';
 
 const modeTypes: PlayMode[] = [
   {
@@ -30,6 +31,7 @@ const modeTypes: PlayMode[] = [
 })
 export class WyPlayerComponent implements OnInit {
   @ViewChild('audio', { static: true }) private audio: ElementRef;
+  @ViewChild(WyPlayerPanelComponent, { static: false }) private playerPanel: WyPlayerPanelComponent;
   private audioEl: HTMLAudioElement;
   percent = 0;
   bufferPercent = 0;
@@ -97,20 +99,24 @@ export class WyPlayerComponent implements OnInit {
     if (this.songList) {
       let list = this.songList.slice();
       if (mode.type === 'random') {
+        console.log("mode.type === 'random'");
         list = shuffle(this.songList);
         this.updateCurrentIndex(list, this.currentSong);
         this.store$.dispatch(SetPlayList({ playList: list }));
-      }else if (mode.type === 'loop') {
+      } else if (mode.type === 'loop') {
+        console.log("mode.type === 'loop'");
         this.updateCurrentIndex(list, this.currentSong);
         this.store$.dispatch(SetPlayList({ playList: this.songList }));
-      }else if (mode.type === 'singleLoop') {
+      } else if (mode.type === 'singleLoop') {
+        console.log("mode.type === 'singleLoop'");
         this.store$.dispatch(SetPlayList({ playList: [this.currentSong] }));
         this.updateCurrentIndex(list, this.currentSong);
       }
     }
   }
   updateCurrentIndex(list: Song[], currentSong: Song) {
-    const newIndex = list.findIndex(item => item.id === currentSong.id);
+    // const newIndex = list.findIndex(item => item.id === currentSong.id);
+    const newIndex = findIndex(list, currentSong);
     this.store$.dispatch(SetCurrentIndex({ currentIndex: newIndex }));
   }
 
@@ -187,6 +193,9 @@ export class WyPlayerComponent implements OnInit {
   loop() {
     this.audioEl.currentTime = 0;
     this.play();
+    if (this.playerPanel) {
+      this.playerPanel.seekLyric(0);
+    }
   }
 
   private updateIndex(index: number) {
@@ -198,6 +207,9 @@ export class WyPlayerComponent implements OnInit {
   onPercentChange(per: number) {
     if (this.currentSong) {
       this.audioEl.currentTime = this.duration * (per / 100);
+      if (this.playerPanel) {
+        this.playerPanel.seekLyric(this.audioEl.currentTime * 1000);
+      }
     }
   }
 
@@ -209,7 +221,7 @@ export class WyPlayerComponent implements OnInit {
     this.togglePanel("showVolumePanel");
   }
   toggleListPanel(evt: MouseEvent) {
-    if(this.songList.length){
+    if (this.songList.length) {
       this.togglePanel("showPanel");
     }
   }
@@ -247,13 +259,16 @@ export class WyPlayerComponent implements OnInit {
     this.store$.dispatch(SetPlayMode({ playMode: modeTypes[++this.modeCount % 3] }));
   }
 
-  onEnded(){
+  onEnded() {
     this.playing = false;
+    if (this.currentMode.type === 'singleLoop') {
+      this.loop();
+    }
     this.onNext(this.currentIndex + 1);
   }
 
 
-  onChangeSong(song: Song){
+  onChangeSong(song: Song) {
     this.updateCurrentIndex(this.playList, song);
   }
 }
