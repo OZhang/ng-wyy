@@ -1,15 +1,16 @@
-import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, Inject } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, Inject } from '@angular/core';
 import { Store, select } from '@ngrx/store';
 import { AppStoreModule } from '../../../store/index';
 import { getSongList, getPlayList, getCurrentIndex, getPlayMode, getCurrentSong } from '../../../store/selectors/player.selector';
 import { Song } from '../../../services/data-types/common.types';
 import { PlayMode } from './player-type';
-import { SetCurrentIndex, SetPlayMode, SetPlayList } from 'src/app/store/actions/player.action';
-import { Subscribable, Subscription, fromEvent } from 'rxjs';
-import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
+import { SetCurrentIndex, SetPlayMode, SetPlayList, SetSongList } from 'src/app/store/actions/player.action';
+import { Subscription, fromEvent } from 'rxjs';
 import { DOCUMENT } from '@angular/common';
 import { shuffle, findIndex } from 'src/app/utils/array';
 import { WyPlayerPanelComponent } from './wy-player-panel/wy-player-panel.component';
+import { NzModalService } from 'ng-zorro-antd';
+import { BatchActionsService } from 'src/app/store/batch-actions.service';
 
 const modeTypes: PlayMode[] = [
   {
@@ -48,14 +49,18 @@ export class WyPlayerComponent implements OnInit {
   volume = 60;
   showVolumePanel: boolean = false;
   showPanel: boolean = false;
-  selfClick = false;
+  bindFlag = false;
   private winClick: Subscription;
 
   currentMode: PlayMode;
   modeCount: number = 0;
 
-  constructor(private store$: Store<AppStoreModule>,
-    @Inject(DOCUMENT) private doc: Document) {
+  constructor(
+    private store$: Store<AppStoreModule>,
+    @Inject(DOCUMENT) private doc: Document,
+    private nzModalServe: NzModalService,
+    private batchActionsService: BatchActionsService
+  ) {
     const appStore$ = this.store$.pipe(select('player'));
     const stateArr = [
       {
@@ -216,43 +221,25 @@ export class WyPlayerComponent implements OnInit {
   onVolumeChange(per: number) {
     this.audioEl.volume = per / 100;
   }
-  toggleVolPanel(evt: MouseEvent) {
-    // evt.stopPropagation();
+  toggleVolPanel() {
     this.togglePanel("showVolumePanel");
   }
-  toggleListPanel(evt: MouseEvent) {
+  toggleListPanel() {
     if (this.songList.length) {
       this.togglePanel("showPanel");
     }
   }
 
-
   togglePanel(type: string) {
     this[type] = !this[type];
-    if (this.showVolumePanel || this.showPanel) {
-      this.bindDocumentClickListener();
-    }
-    else {
-      this.unBindDocumentClickListener();
-    }
+    this.bindFlag = this.showVolumePanel || this.showPanel
   }
-  unBindDocumentClickListener() {
-    if (this.winClick) {
-      this.winClick.unsubscribe();
-      this.winClick = null;
-    }
-  }
-  bindDocumentClickListener() {
-    if (!this.winClick) {
-      this.winClick = fromEvent(this.doc, 'click').subscribe(() => {
-        if (!this.selfClick) {
-          this.showVolumePanel = false;
-          this.showPanel = false;
-          this.unBindDocumentClickListener();
-        }
-        this.selfClick = false;
-      })
-    }
+
+  onClickOutside() {
+    console.log("onClickOutside()");
+    this.showVolumePanel = false;
+    this.showPanel = false;
+    this.bindFlag = false;
   }
 
   changeMode() {
@@ -271,4 +258,18 @@ export class WyPlayerComponent implements OnInit {
   onChangeSong(song: Song) {
     this.updateCurrentIndex(this.playList, song);
   }
+
+  onDeleteSong(song: Song) {
+    this.batchActionsService.deleteSong(song);
+  }
+
+  onClearSong() {
+    this.nzModalServe.confirm({
+      nzTitle: '确认清空列表',
+      nzOnOk: () => {
+        this.batchActionsService.clearSong();
+      }
+    });
+  }
+
 }

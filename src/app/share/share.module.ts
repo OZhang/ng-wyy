@@ -17,6 +17,5 @@ import { WyUiModule } from './wy-ui/wy-ui.module';
     NgZorroAntdModule,
     WyUiModule,
   ],
-  declarations: []
 })
 export class ShareModule { }

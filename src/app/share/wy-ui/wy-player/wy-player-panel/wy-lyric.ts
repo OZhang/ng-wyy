@@ -2,7 +2,7 @@ import { Lyric } from 'src/app/services/data-types/common.types';
 import { from, zip, Subject, Subscription, timer } from 'rxjs';
 import { skip } from 'rxjs/operators';
 
-const timeExp = /\[(\d{2}):(\d{2})\.(\d{2,3})\]/;
+const timeExp = /\[(\d{2}):(\d{2})(\.\d{2,3})?\]/;
 
 export interface BaseLyricLine {
     txt: string;
@@ -43,12 +43,17 @@ export class WyLyric {
     }
 
     generLyric() {
+        console.log('generLyric')
         const lines = this.lrc.lyric.split('\n');
         lines.forEach(line => this.makeLine(line));
     }
 
     generTLyric() {
+        console.log('generTLyric')
+
         const lines = this.lrc.lyric.split('\n');
+
+
         const tlines = this.lrc.tlyric.split('\n').filter(item => timeExp.exec(item) != null);
 
         const moreLine = lines.length - tlines.length;
@@ -58,6 +63,9 @@ export class WyLyric {
         } else {
             tempArr = [tlines, lines];
         }
+
+        console.log('generTLyric, ', tempArr)
+
 
         const first = timeExp.exec(tempArr[1][0])[0]
 
